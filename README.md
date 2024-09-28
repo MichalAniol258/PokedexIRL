@@ -49,8 +49,8 @@
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/your-username/pokedex-in-real-life.git
-   cd pokedex-in-real-life
+   git clone https://github.com/MichalAniol258/PokedexIRL.git
+   cd PokedexIRL
    ```
 
 2. Install dependencies:
