@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+
+    <title>Pokémon Details</title>
+    <link rel="stylesheet" href="cardStyle.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inria+Sans:ital,wght@0,300;0,400;0,700;1,300;1,400;1,700&family=Roboto+Mono:ital,wght@0,100..700;1,100..700&display=swap"
+        rel="stylesheet">
+</head>
+
+<body>
+    <section id="sHeader">
+        <header>
+            <img src="imgs/header.svg" alt="" srcset="">
+        </header>
+    </section>
+
+    <section id="sMain">
+    </section>
+
+    <script>
+        // Function to get query parameters from URL
+        function getQueryParameter(name) {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get(name);
+        }
+
+        function dataURLtoFile(dataurl, filename) {
+            let arr = dataurl.split(','), mime = arr[0].match(/:(.*?);/)[1],
+                bstr = atob(arr[1]), n = bstr.length, u8arr = new Uint8Array(n);
+            while (n--) {
+                u8arr[n] = bstr.charCodeAt(n);
+            }
+            return new File([u8arr], filename, { type: mime });
+        }
+        const photo = document.querySelector('#photo');
+
+        window.addEventListener('load', () => {
+            const pokemonId = getQueryParameter('id'); // Get Pokémon ID from URL
+            if (pokemonId) {
+
+
+                // Fetch Pokémon details using the ID
+                fetch(`/api/pokemonNumber/${pokemonId}`)
+                    .then(response => response.json())
+                    .then(pokemonDetails => {
+                        if (pokemonDetails.length > 0) {
+
+                            const pokemon = pokemonDetails[0]; // Assuming only one result is returned
+
+
+                            document.querySelector('#sMain').innerHTML = `
+                                          <main>
+                <img id="photo" src="${pokemon.imageSrc}" alt="Zdjęcie zrobione kamerą">
+
+                <div class="pokemonInfo">
+                    <div class="title">
+                        <h1 id="pokemonName">${pokemon.name}</h1>
+                        <div id="pokemonType">${pokemon.type}</div>
+                    </div>
+
+                    <div class="describttion">
+                        <p id="description">
+                        ${pokemon.description}
+                        </p>
+                    </div>
+
+                    <div class="deleteObject"><img src="imgs/button-delete.png" onclick="deleteButton(${pokemonId});" id="button-delete" alt="" srcset=""></div>
+                </div>
+            </main>
+                            `;
+                            const id = pokemonId
+                        } else {
+                            document.getElementById('pokemonDetails').innerHTML = '<p>No details found for this Pokémon.</p>';
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Błąd podczas pobierania danych:', error);
+                    });
+            } else {
+                document.getElementById('pokemonDetails').innerHTML = '<p>No Pokémon ID provided.</p>';
+            }
+        });
+
+        // Function to delete a Pokémon and reset the view
+        // Function to delete a Pokémon and reset the view
+        function deleteButton(id) {
+            console.log('Deleting Pokémon with ID:', id);  // Log the ID
+            fetch('/api/deleteAndReset', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ idToDelete: id })
+            })
+                .then(response => {
+                    if (response.ok) {
+                        console.log('Pokémon deleted and autoincrement reset');
+                        window.location.href = 'indexMain.ejs';
+                        document.querySelector('#sMain').innerHTML = '<p>Pokémon został usunięty.</p>';
+                    } else {
+                        console.error('Błąd podczas usuwania Pokémona:', response.statusText);
+                    }
+                })
+                .catch(error => {
+                    console.error('Błąd podczas komunikacji z serwerem:', error);
+                });
+        }
+
+
+    </script>
+
+</body>
+
+</html>

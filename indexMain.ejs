@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+
+    <title>Pokedex</title>
+    <link rel="stylesheet" href="styleMain.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inria+Sans:ital,wght@0,300;0,400;0,700;1,300;1,400;1,700&family=Roboto+Mono:ital,wght@0,100..700;1,100..700&display=swap"
+        rel="stylesheet">
+</head>
+
+<body>
+    <section id="sHeader">
+        <header>
+            <img src="imgs/header.svg" alt="" srcset="">
+        </header>
+    </section>
+
+    <section id="sMain">
+        <main>
+            <!--
+            <div class="pokemonCard">
+                <a href="photoCard.html">
+            <div class="container">
+                <div class="pokemonInfo">
+                    <p><b>NDE1</b></p>
+                    <p><b>Squirtle</b></p>
+                    <p>Water</p>
+                </div>
+                <img src="Pokemons/water-icon.svg" class="bgType" alt="" srcset="">
+                <div class="pokemonIcon">
+                    <img src="Pokemons/squirtle.png" class="pokemonIMG" alt="" srcset="">
+                </div>
+            </div>
+            </a>
+            </div>
+            -->
+        </main>
+    </section>
+
+    <section id="sNav">
+        <nav>
+            <ul>
+                <li>
+                    <a href="indexCamera.html">
+                        <img src="imgs/camera.png" id="cameraIMG" alt="">
+                        Camera
+                    </a>
+                </li>
+
+
+                <li>
+                    <a href="indexMain.ejs">
+                        <img src="imgs/pokeball.png" id="pokeballIMG" alt="">
+                        Pokedex
+                    </a>
+                </li>
+
+
+                <li>
+                    <form action="/logout?_method=DELETE" method="post">
+                        <button type="submit">
+                            <img src="imgs/logout-2-svgrepo-com.svg" id="logout" alt="" srcset="">
+                            Logout
+                        </button>
+                    </form>
+                </li>
+
+            </ul>
+        </nav>
+    </section>
+
+    <script>
+
+        window.addEventListener('load', async () => {
+            const mainElement = document.querySelector('main');
+
+            try {
+                // Fetch all Pokémon data initially
+                const response = await fetch('/api/pokemon');
+                const pokemonDataArray = await response.json();
+
+                if (pokemonDataArray.length > 0) {
+                    pokemonDataArray.forEach(pokemon => {
+                        // Create a new pokemonCard div
+                        const newCard = document.createElement('div');
+                        newCard.classList.add('pokemonCard');
+                        newCard.style = pokemon.bgcolor;
+
+                        newCard.innerHTML = `
+                    <a href="photoCard.html?id=${pokemon.id}">
+                        <div class="container">
+                            <div class="pokemonInfo">
+                                <p><b>NDE${pokemon.pokedexNumber || 'N/A'}</b></p>
+                                <p><b>${pokemon.name}</b></p>
+                                <p>${pokemon.type}</p>
+                            </div>
+                            <img src="Pokemons/${pokemon.color}-icon.svg" class="bgType" alt="">
+                            <div id="chuj">
+                                <div class="pokemonIcon" style="background-image: url(${pokemon.imageSrc});"></div>
+                            </div>
+                        </div>
+                    </a>
+                `;
+
+                        // Append the new card to the main element
+                        mainElement.appendChild(newCard);
+                    });
+
+                    // Add click event listeners to each Pokémon link
+                    document.querySelectorAll('.pokemonLink').forEach(link => {
+                        link.addEventListener('click', async function (event) {
+                            event.preventDefault(); // Prevent default anchor behavior
+                            const pokemonId = this.getAttribute('data-id'); // Get Pokémon ID from data attribute
+                            try {
+                                const pokemonResponse = await fetch(`/api/pokemonNumber/${pokemonId}`);
+                                const pokemonDetails = await pokemonResponse.json();
+                                // Handle displaying Pokémon details here
+                                console.log(pokemonDetails); // Replace with actual display logic
+                            } catch (error) {
+                                console.error('Błąd podczas pobierania danych:', error);
+                            }
+                        });
+                    });
+                } else {
+                    console.log("No Pokémon data found in the database.");
+                }
+            } catch (error) {
+                console.error('Błąd podczas pobierania danych:', error);
+            }
+        });
+
+    </script>
+
+</body>
+
+</html>

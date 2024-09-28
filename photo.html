@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+
+    <title>Pokemon - details</title>
+    <link rel="stylesheet" href="cardStyle.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inria+Sans:ital,wght@0,300;0,400;0,700;1,300;1,400;1,700&family=Roboto+Mono:ital,wght@0,100..700;1,100..700&display=swap"
+        rel="stylesheet">
+</head>
+
+<body>
+    <!-- Ekran ładowania -->
+    <div id="loading">
+        <div id="loadingScreen">
+            <p><img src="imgs/loading-no-bg.gif" alt="" srcset=""></p>
+        </div>
+    </div>
+    <!-- Główna zawartość strony (początkowo ukryta) -->
+    <div id="content" style="display: none;">
+        <section id="sHeader">
+            <header>
+                <img src="imgs/header.svg" id="headerIMG" alt="header" srcset="">
+            </header>
+        </section>
+
+        <section id="sMain">
+            <main>
+                <img id="photo" alt="Zdjęcie zrobione kamerą">
+
+                <div class="pokemonInfo">
+                    <div class="title">
+                        <h1 id="pokemonName"></h1>
+                        <p id="pokemonType"></p>
+                    </div>
+
+                    <div class="describtion">
+                        <p id="description"></p>
+                    </div>
+                </div>
+            </main>
+        </section>
+
+        <section id="sNav">
+            <nav>
+                <ul>
+                    <li>
+                        <a href="indexCamera.html">
+                            <img src="imgs/camera.png" id="cameraIMG" alt="">
+                            Camera
+                        </a>
+                    </li>
+
+                    <li>
+                        <img src="imgs/IconSnap.svg" id="iconSnapIMG" alt="">
+                    </li>
+
+                    <li>
+                        <a href="indexMain.ejs">
+                            <img src="imgs/pokeball.png" id="pokeballIMG" alt="">
+                            Pokedex
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </section>
+    </div>
+
+    <script>
+        // Function to convert base64 to file
+        function dataURLtoFile(dataurl, filename) {
+            let arr = dataurl.split(','), mime = arr[0].match(/:(.*?);/)[1],
+                bstr = atob(arr[1]), n = bstr.length, u8arr = new Uint8Array(n);
+            while (n--) {
+                u8arr[n] = bstr.charCodeAt(n);
+            }
+            return new File([u8arr], filename, { type: mime });
+        }
+
+        // DOM elements
+        const photo = document.getElementById('photo');
+        const descriptionElement = document.getElementById('description');
+        const pokemonName = document.getElementById('pokemonName');
+        const pokemonType = document.getElementById('pokemonType');
+        const loadingScreen = document.getElementById('loading');
+        const content = document.getElementById('content');
+        const token = localStorage.getItem('jwtToken');
+        // Fetch user data
+        fetch('/api/findUserById', {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${token}` // Dodaj token JWT
+            }
+        })
+            .then(response => response.json())
+            .then(users => {
+                const userId = users.id; // Get the latest user ID from the response
+                if (userId) {
+                    console.log('Latest User ID:', userId);
+
+                    // Fetch image data from the server
+                    fetch('/api/dataImage1', {
+                        method: 'GET',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${token}`
+                        }
+                    })
+                        .then(response => response.json())
+                        .then(data => {
+                            const pokemonImageData = data.pokemonImageData;
+
+                            if (pokemonImageData) {
+                                // Display the image
+                                photo.src = pokemonImageData;
+
+
+                                // Convert base64 to file
+                                const file = dataURLtoFile(pokemonImageData, 'photo.png');
+                                const formData = new FormData();
+                                formData.append("photo", file);
+
+                                // Fetch token from LocalStorage
+                                // Ensure you have this line to retrieve the token
+
+                                // Submit image for analysis
+                                fetch("/analyze", {
+                                    method: "POST",
+                                    body: formData,
+                                    headers: {
+                                        'Authorization': `Bearer ${token}` // Use the retrieved token here
+                                    }
+                                })
+                                    .then(response => response.json())
+                                    .then(analyzeData => {
+                                        console.log('Received data:', analyzeData);
+
+                                        loadingScreen.style.display = 'none';
+                                        content.style.display = 'block';
+
+                                        // Assign values to HTML elements
+                                        pokemonName.innerHTML = analyzeData.pokemonName || "Unknown";
+                                        pokemonType.innerHTML = analyzeData.pokemonType || "Unknown";
+                                        descriptionElement.innerHTML = analyzeData.description || "Brak opisu.";
+
+                                        // Add userId to pokemonData
+                                        const pokemonData = {
+                                            id: analyzeData.pokemonId || "N/A",
+                                            name: analyzeData.pokemonName || "Unknown",
+                                            type: analyzeData.pokemonType || "Unknown",
+                                            color: analyzeData.pokemonColor || "Unknown",
+                                            bgcolor: analyzeData.pokemonBgColor || "Unknown",
+                                            description: analyzeData.description || "Brak opisu.",
+                                            imageSrc: pokemonImageData,
+                                            uzytkownik_id: userId, // Add user ID to pokemonData
+                                            pokedexNumber: analyzeData.pokedexNumber
+                                        };
+
+                                        fetch('/api/data', {
+                                            method: 'POST',
+                                            headers: {
+                                                'Content-Type': 'application/json',
+                                                'Authorization': `Bearer ${token}` // Dodaj nagłówek autoryzacji
+                                            },
+                                            body: JSON.stringify({ pokemonData }) // pokemonData powinno być poprawnie zdefiniowane
+                                        })
+                                            .then(response => {
+                                                if (!response.ok) {
+                                                    throw new Error('HTTP error! Status: ' + response.status);
+                                                }
+                                                return response.json();
+                                            })
+                                            .then(saveData => {
+                                                console.log('Dane zapisane:', saveData);
+                                            })
+                                            .catch(error => {
+                                                console.error('Błąd:', error);
+                                            });
+
+                                    })
+                                    .catch(error => {
+                                        console.error('Błąd przy pobieraniu danych:', error);
+                                        descriptionElement.innerText = "Wystąpił błąd podczas analizy obrazu.";
+                                        loadingScreen.style.display = 'none'; // Hide loading screen
+                                        content.style.display = 'block'; // Show the content
+                                    });
+                            } else {
+                                console.error('No pokemonImageData found in response');
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Błąd przy pobieraniu danych:', error);
+                        });
+                } else {
+                    console.error('Brak użytkowników w tablicy.');
+                }
+            })
+            .catch(error => {
+                console.error('Błąd przy pobieraniu użytkowników:', error);
+            });
+    </script>
+
+
+
+</body>
+
+</html>

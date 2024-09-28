@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+
+    <title>Pokedex - camera</title>
+    <link rel="stylesheet" href="styleCamera.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inria+Sans:ital,wght@0,300;0,400;0,700;1,300;1,400;1,700&family=Roboto+Mono:ital,wght@0,100..700;1,100..700&display=swap"
+        rel="stylesheet">
+</head>
+
+<body>
+    <section id="sHeader">
+        <header>
+            <img src="imgs/header.svg" alt="" srcset="">
+        </header>
+    </section>
+
+    <section id="sMain">
+        <main>
+
+
+
+
+
+            <div id="przedCamera">
+                <img src="imgs/circle-padding-shadow-no-bg.png" id="cameraBG" alt="" srcset="">
+                <video id="video" class="camera-stream" autoplay>Video stream not available.</video>
+            </div>
+
+            <div id="opisCamera">
+                <p>Camera</p>
+                <span>Capture your pokemon</span>
+            </div>
+
+            <canvas id="canvas" style="display: none;"></canvas>
+            <script async src="capture.js"></script>
+            <img id="photo" alt="Zdjęcie z kamery" style="display:none;" />
+        </main>
+    </section>
+
+    <section id="sNav">
+        <nav>
+            <ul>
+                <li>
+                    <a href="indexMain.ejs">
+                        <img src="imgs/chevron-left-svgrepo-com.svg" id="cameraIMG" alt="">
+                        Back
+                    </a>
+                </li>
+
+                <li>
+                    <img src="imgs/IconSnap.svg" id="iconSnapIMG" alt="">
+                </li>
+
+                <li>
+                </li>
+            </ul>
+        </nav>
+    </section>
+</body>
+
+</html>
