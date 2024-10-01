@@ -10,7 +10,7 @@
 - 📊 **Detailed Pokémon Information**: Retrieve comprehensive details about recognized Pokémon, including type, stats, and evolution.
 - 🔐 **User Authentication**: Secure login and registration system powered by Passport.js and JWT-based email verification.
 - 💾 **MySQL Integration**: Store user data and Pokémon analyses in a structured database.
-- 🔍 **Responsive Design**: Fully responsive layout for seamless use on mobile and desktop devices.
+- 🔍 **Design**: The app is specifically designed for mobile devices, offering an intuitive interface and full responsiveness on phones.
 - 🖼️ **Graphics**: All images used in the project are sourced from the internet.
   
 ## How It Works
