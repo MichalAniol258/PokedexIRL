@@ -69,7 +69,8 @@
    DB_USER=root
    DB_PASS=password
    DB_NAME=pokedex
-   JWT_SECRET=your_jwt_secret
+   SESSION_SECRET=your_jwt_secret
+   SESSION_SECRET3=your_jwt_secret
    ```
 
 5. Run the server:
